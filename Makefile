@@ -209,17 +209,25 @@ rpm-setup:
 	@echo "Setuping rpm env ...;"
 	@build/rpm/setup-env.sh
 
-rpm: install
-	@echo "Note: run 'make rpm-setup' to setup build env for rpm builder"
-	@echo "Building rpm ...;"
-	@yum -y install rpm-build rpmdevtools wget
+# rpm release name should be custom defined
+RPM_RELEASE_NAME ?= 1%{?dist}
+#TAG_VERSION ?= $(shell echo $(BUILD_TAGS)| cut -c2-)
+TAG_VERSION ?= 2.0.0
+
+# eg with git, use: make rpm -e RPM_RELEASE_NAME=1.el7
+# eg without git, use: make rpm -e RPM_RELEASE_NAME=1.el7 -e BUILD_TAGS=v2.0.0 -e GIT_COMMIT=c63ab16
+rpm:
+	@echo "Note: you need to run this as root user"
+	@echo "Building rpm ..."
+	@yum -y install rpm-build rpmdevtools
 	@rm -rf ~/rpmbuild/BUILD/*
 	@rpmdev-setuptree
-	@wget https://github.com/etcd-io/etcd/releases/download/v3.5.0/etcd-v3.5.0-linux-amd64.tar.gz && tar -xf etcd-v3.5.0-linux-amd64.tar.gz
-	@cp etcd-v3.5.0-linux-amd64/etcd bin/etcd
-	@wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2021-02-14T04-01-33Z -O bin/minio
-	@cp -r bin ~/rpmbuild/BUILD/
-	@cp -r lib ~/rpmbuild/BUILD/
-	@cp -r configs ~/rpmbuild/BUILD/
-	@cp -r build/rpm/services ~/rpmbuild/BUILD/
-	@QA_RPATHS="$$[ 0x001|0x0002|0x0020 ]" rpmbuild -ba ./build/rpm/milvus.spec
+	@cp -f ./build/rpm/milvus.spec ~/rpmbuild/SPECS/
+	@spectool -g -R ~/rpmbuild/SPECS/milvus.spec \
+                --define "release $(RPM_RELEASE_NAME)" \
+                --define "tag_version $(TAG_VERSION)" \
+                --define "git_commit $(GIT_COMMIT)"
+	@QA_RPATHS="$$[ 0x001|0x0002|0x0020 ]" rpmbuild -ba ~/rpmbuild/SPECS/milvus.spec \
+                --define "release $(RPM_RELEASE_NAME)" \
+                --define "tag_version $(TAG_VERSION)" \
+                --define "git_commit $(GIT_COMMIT)"
