@@ -190,10 +190,11 @@ rpm-setup:
 
 # rpm release name should be custom defined
 RPM_RELEASE_NAME ?= 1%{?dist}
-TAG_VERSION ?= $(shell echo $(BUILD_TAGS)| cut -c2-)
+#TAG_VERSION ?= $(shell echo $(BUILD_TAGS)| cut -c2-)
+TAG_VERSION ?= 2.0.0
 
-# eg with git, use: make rpm -e RPM_RELEASE_NAME=preGA
-# eg without git, use: make rpm -e RPM_RELEASE_NAME=preGA -e BUILD_TAGS=v2.0.0-pre-ga -e GIT_COMMIT=95f0e9a
+# eg with git, use: make rpm -e RPM_RELEASE_NAME=1.el7
+# eg without git, use: make rpm -e RPM_RELEASE_NAME=1.el7 -e BUILD_TAGS=v2.0.0 -e GIT_COMMIT=c63ab16
 rpm:
 	@echo "Note: you need to run this as root user"
 	@echo "Building rpm ..."
