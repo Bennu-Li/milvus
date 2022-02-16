@@ -53,8 +53,8 @@ rm -rf /usr/local/go && rm -f /usr/bin/go && tar -C /usr/local -xzf %{SOURCE4} &
 
 # install camke
 rm -rf /usr/local/cmake-%{cmake_version}-Linux-x86_64 && \
-    rm -f /usr/local/bin/cmake && rm -f /usr/local/bin/ccmake && rm -f /usr/local/bin/cmake-gui && \ 
-    tar -C /usr/local -xzf %{SOURCE5} && \
+    rm -f /usr/local/bin/cmake && rm -f /usr/local/bin/ccmake && rm -f /usr/local/bin/cmake-gui 
+tar -C /usr/local -xzf %{SOURCE5} && \
     ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/cmake /usr/local/bin/cmake && \
     ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/ccmake /usr/local/bin/ccmake && \
     ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/cmake-gui /usr/local/bin/cmake-gui
@@ -113,6 +113,8 @@ done
 
 # remove set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) for libNGT
 sed -i '/set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)/d' internal/core/src/index/thirdparty/NGT/CMakeLists.txt
+
+sed -i '1i set(BOOST_ROOT /root/rpmbuild/BUILD/boost_1_65_1)' internal/core/thirdparty/boost_ext/CMakeLists.txt
 
 export LD_LIBRARY_PATH=${PWD}/internal/core/output/lib/
 make install -e BUILD_TAGS=v%{tag_version} -e GIT_COMMIT=%{git_commit}
