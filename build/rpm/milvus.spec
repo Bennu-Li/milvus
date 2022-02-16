@@ -19,6 +19,7 @@
 %global boost_version_alias 1_65_1
 %global tbb_commit 9e219e24fe223b299783200f217e9d27790a87b0
 %global go_version 1.15.2
+%global cmake_version 3.18.6
 %global arch linux-amd64
 
 
@@ -29,13 +30,13 @@ Summary:          V2 RPM
 License:          ASL 2.0
 URL:              https://milvus.io/
 BuildRequires:    epel-release centos-release-scl-rh wget make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
-#provides:         libtbb.so()(64bit) >= 4.1.9
 ExclusiveArch:    x86_64
 Source0:          https://github.com/milvus-io/milvus/archive/refs/tags/v%{tag_version}.tar.gz#/milvus-%{tag_version}.tar.gz
 Source1:          https://github.com/xianyi/OpenBLAS/archive/v%{openblas_version}.tar.gz#/OpenBLAS-%{openblas_version}.tar.gz
 Source2:          https://boostorg.jfrog.io/artifactory/main/release/%{boost_version}/source/boost_%{boost_version_alias}.tar.gz
 Source3:          https://github.com/wjakob/tbb/archive/%{tbb_commit}.zip#/tbb.zip
 Source4:          https://go.dev/dl/go%{go_version}.%{arch}.tar.gz#/go.tar.gz
+Source5:          https://github.com/Kitware/CMake/releases/download/v%{cmake_version}/cmake-%{cmake_version}-Linux-x86_64.tar.gz#/cmake.tar.gz
 
 %description
 Milvus is an open-source vector database for unstructured data. 
@@ -49,6 +50,12 @@ tar -xf %{SOURCE2} -C %{_builddir}/
 unzip %{SOURCE3} -d %{_builddir}/
 # install go
 rm -rf /usr/local/go && rm -f /usr/bin/go && tar -C /usr/local -xzf %{SOURCE4} && ln -s /usr/local/go/bin/go /usr/bin/go
+
+# install camke
+rm -rf /usr/local/cmake-%{cmake_version}-Linux-x86_64 && \
+    rm -f /usr/bin/cmake && tar -C /usr/local -xzf %{SOURCE5} && \
+    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/cmake /usr/bin/cmake
+    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/ccmake /usr/bin/ccmake
 
 echo "source scl_source enable devtoolset-7" > /etc/profile.d/devtoolset-7.sh
 
@@ -130,7 +137,7 @@ sed -i -e '1i#!/bin/bash' %{buildroot}/usr/bin/milvus
 chmod 755 %{buildroot}/usr/bin/milvus
 strip bin/milvus
 install -m 755 bin/milvus %{buildroot}/usr/bin/milvus-server
-install -m 755 build/rpm/milvus-dependences %{buildroot}/usr/bin/milvus-dependences
+install -m 755 build/rpm/milvus-dependencies %{buildroot}/usr/bin/milvus-dependencies
 
 # lib
 strip lib/libmilvus_indexbuilder.so
@@ -152,7 +159,7 @@ install -m 644 configs/milvus.yaml %{buildroot}/etc/milvus/configs/milvus.yaml
 install -m 644 configs/advanced/etcd.yaml %{buildroot}/etc/milvus/configs/advanced/etcd.yaml
 
 # service
-install -m 644 build/rpm/services/milvus-dependences.service %{buildroot}/etc/systemd/system/milvus-dependences.service
+install -m 644 build/rpm/services/milvus-dependencies.service %{buildroot}/etc/systemd/system/milvus-dependencies.service
 install -m 644 build/rpm/services/milvus-etcd.service %{buildroot}/etc/systemd/system/milvus-etcd.service
 install -m 644 build/rpm/services/milvus-minio.service %{buildroot}/etc/systemd/system/milvus-minio.service
 install -m 644 build/rpm/services/milvus.service %{buildroot}/etc/systemd/system/milvus.service
@@ -165,7 +172,7 @@ chmod 644 %{buildroot}/etc/ld.so.conf.d/milvus.conf
 install -m 644 README.md %{buildroot}/usr/share/doc/milvus/README.md
 install -m 644 build/rpm/man/milvus.1.gz %{buildroot}%{_mandir}/man1/milvus.1.gz
 install -m 644 build/rpm/man/milvus-server.1.gz %{buildroot}%{_mandir}/man1/milvus-server.1.gz
-install -m 644 build/rpm/man/milvus-dependences.1.gz %{buildroot}%{_mandir}/man1/milvus-dependences.1.gz
+install -m 644 build/rpm/man/milvus-dependencies.1.gz %{buildroot}%{_mandir}/man1/milvus-dependencies.1.gz
 
 %post
 # update ld, systemd cache
@@ -185,7 +192,7 @@ systemctl daemon-reload
 %files
 /usr/bin/milvus
 /usr/bin/milvus-server
-/usr/bin/milvus-dependences
+/usr/bin/milvus-dependencies
 
 /lib64/milvus/libmilvus_indexbuilder.so
 /lib64/milvus/libmilvus_segcore.so
@@ -201,7 +208,7 @@ systemctl daemon-reload
 %config(noreplace) /etc/systemd/system/milvus.service
 %config(noreplace) /etc/systemd/system/milvus-minio.service
 %config(noreplace) /etc/systemd/system/milvus-etcd.service
-%config(noreplace) /etc/systemd/system/milvus-dependences.service
+%config(noreplace) /etc/systemd/system/milvus-dependencies.service
 
 %config(noreplace) /etc/ld.so.conf.d/milvus.conf
 
@@ -209,7 +216,7 @@ systemctl daemon-reload
 
 %{_mandir}/man1/milvus.1.gz
 %{_mandir}/man1/milvus-server.1.gz
-%{_mandir}/man1/milvus-dependences.1.gz
+%{_mandir}/man1/milvus-dependencies.1.gz
 
 %changelog
 * Sun Feb 13 2022 Yunmei Li <yunmei.li@zilliz.com> - 2.0.0-1 

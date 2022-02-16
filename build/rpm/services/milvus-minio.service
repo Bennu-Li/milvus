@@ -14,9 +14,9 @@
 #
 [Unit]
 Description=MinIO of Milvus Standalone Server
-wants=milvus-dependences.service
-Requires=milvus-dependences.service
-After=network.target syslog.target milvus-dependences.service
+wants=milvus-dependencies.service
+Requires=milvus-dependencies.service
+After=network.target syslog.target milvus-dependencies.service
 PartOf=milvus.service
 
 [Install]
