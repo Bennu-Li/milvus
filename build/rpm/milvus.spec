@@ -29,7 +29,7 @@ Summary:          V2 RPM
 License:          ASL 2.0
 URL:              https://milvus.io/
 BuildRequires:    epel-release centos-release-scl-rh wget make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
-provides:         libtbb.so()(64bit) >= 4.1.9
+#provides:         libtbb.so()(64bit) >= 4.1.9
 ExclusiveArch:    x86_64
 Source0:          https://github.com/milvus-io/milvus/archive/refs/tags/v%{tag_version}.tar.gz#/milvus-%{tag_version}.tar.gz
 Source1:          https://github.com/xianyi/OpenBLAS/archive/v%{openblas_version}.tar.gz#/OpenBLAS-%{openblas_version}.tar.gz
@@ -56,7 +56,6 @@ echo "source scl_source enable devtoolset-7" > /etc/profile.d/devtoolset-7.sh
 # build install lib tbb
 cd %{_builddir}/tbb-%{tbb_commit}/build
 source /etc/profile.d/devtoolset-7.sh && \
-    cd build && \
     cmake .. && make -j && make install
 
 # build install lib openblas
@@ -140,6 +139,8 @@ strip lib/libmilvus_segcore.so
 install -m 755 lib/libmilvus_segcore.so %{buildroot}/lib64/milvus/libmilvus_segcore.so
 strip %{_builddir}/OpenBLAS-%{openblas_version}/libopenblas-r0.3.9.so
 install -m 755 %{_builddir}/OpenBLAS-%{openblas_version}/libopenblas-r0.3.9.so %{buildroot}/lib64/milvus/libopenblas.so.0
+strip %{_builddir}/tbb-%{tbb_commit}/build/libtbb.so
+install -m 755 %{_builddir}/tbb-%{tbb_commit}/build/libtbb.so %{buildroot}/lib64/milvus/libtbb.so
 strip lib/libfiu.so.1.00
 install -m 755 lib/libfiu.so.1.00 %{buildroot}/lib64/milvus/libfiu.so.0
 strip lib/libngt.so.1.12.0 
@@ -192,6 +193,7 @@ systemctl daemon-reload
 /lib64/milvus/libfiu.so.0
 /lib64/milvus/libngt.so.1
 /lib64/milvus/libgfortran.so.4
+/lib64/milvus/libtbb.so
 
 %config(noreplace) /etc/milvus/configs/milvus.yaml
 %config(noreplace) /etc/milvus/configs/advanced/etcd.yaml

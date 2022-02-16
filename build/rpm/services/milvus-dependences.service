@@ -26,7 +26,6 @@ Alias=milvus-dependences.service
 Type=oneshot
 StandardOutput=journal
 StandardError=inherit
-Restart=always
 
 # Start main service
-ExecStart=/usr/bin/milvus-dependces
+ExecStart=/usr/bin/milvus-dependences
