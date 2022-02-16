@@ -52,10 +52,10 @@ unzip %{SOURCE3} -d %{_builddir}/
 rm -rf /usr/local/go && rm -f /usr/bin/go && tar -C /usr/local -xzf %{SOURCE4} && ln -s /usr/local/go/bin/go /usr/bin/go
 
 # install camke
-rm -rf /usr/local/cmake-%{cmake_version}-Linux-x86_64 && \
-    rm -f /usr/bin/cmake && tar -C /usr/local -xzf %{SOURCE5} && \
-    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/cmake /usr/bin/cmake
-    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/ccmake /usr/bin/ccmake
+#rm -rf /usr/local/cmake-%{cmake_version}-Linux-x86_64 && \
+#    rm -f /usr/bin/cmake && tar -C /usr/local -xzf %{SOURCE5} && \
+#    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/cmake /usr/bin/cmake
+#    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/ccmake /usr/bin/ccmake
 
 echo "source scl_source enable devtoolset-7" > /etc/profile.d/devtoolset-7.sh
 

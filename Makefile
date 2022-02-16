@@ -211,8 +211,7 @@ rpm-setup:
 
 # rpm release name should be custom defined
 RPM_RELEASE_NAME ?= 1%{?dist}
-#TAG_VERSION ?= $(shell echo $(BUILD_TAGS)| cut -c2-)
-TAG_VERSION ?= 2.0.0
+TAG_VERSION ?= $(shell echo $(BUILD_TAGS)| cut -c2-)
 
 # eg with git, use: make rpm -e RPM_RELEASE_NAME=1.el7
 # eg without git, use: make rpm -e RPM_RELEASE_NAME=1.el7 -e BUILD_TAGS=v2.0.0 -e GIT_COMMIT=c63ab16
