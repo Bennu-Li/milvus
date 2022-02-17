@@ -29,7 +29,8 @@ Release:          %{release}
 Summary:          V2 RPM
 License:          ASL 2.0
 URL:              https://milvus.io/
-BuildRequires:    epel-release centos-release-scl-rh wget git python3-devel make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
+BuildRequires:    epel-release centos-release-scl-rh
+BuildRequires:    wget git python3-devel make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
 ExclusiveArch:    x86_64
 Source0:          https://github.com/milvus-io/milvus/archive/refs/tags/v%{tag_version}.tar.gz#/milvus-%{tag_version}.tar.gz
 Source1:          https://github.com/xianyi/OpenBLAS/archive/v%{openblas_version}.tar.gz#/OpenBLAS-%{openblas_version}.tar.gz
