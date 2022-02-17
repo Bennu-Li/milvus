@@ -29,7 +29,7 @@ Release:          %{release}
 Summary:          V2 RPM
 License:          ASL 2.0
 URL:              https://milvus.io/
-BuildRequires:    epel-release centos-release-scl-rh wget make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
+BuildRequires:    epel-release centos-release-scl-rh wget git python3-devel make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
 ExclusiveArch:    x86_64
 Source0:          https://github.com/milvus-io/milvus/archive/refs/tags/v%{tag_version}.tar.gz#/milvus-%{tag_version}.tar.gz
 Source1:          https://github.com/xianyi/OpenBLAS/archive/v%{openblas_version}.tar.gz#/OpenBLAS-%{openblas_version}.tar.gz
@@ -74,8 +74,8 @@ source /etc/profile.d/devtoolset-7.sh && make TARGET=CORE2 DYNAMIC_ARCH=1 DYNAMI
 
 # build install lib boost
 cd %{_builddir}/boost_%{boost_version_alias}
-source /etc/profile.d/devtoolset-7.sh && ./bootstrap.sh --prefix=/usr/lib --with-toolset=gcc --without-libraries=python && \
-    ./b2 -j2 --prefix=/usr/lib --without-python toolset=gcc install
+source /etc/profile.d/devtoolset-7.sh && ./bootstrap.sh --prefix=/usr/local --with-toolset=gcc --without-libraries=python && \
+    ./b2 -j2 --prefix=/usr/local --without-python toolset=gcc install
 
 # build install milvus
 cd %{_builddir}/milvus-%{tag_version}
@@ -114,7 +114,7 @@ done
 # remove set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) for libNGT
 sed -i '/set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)/d' internal/core/src/index/thirdparty/NGT/CMakeLists.txt
 
-sed -i '1i set(BOOST_ROOT /root/rpmbuild/BUILD/boost_1_65_1)' internal/core/thirdparty/boost_ext/CMakeLists.txt
+sed '1i set(BOOST_ROOT /root/rpmbuild/BUILD/boost_1_65_1)' internal/core/thirdparty/boost_ext/CMakeLists.txt
 
 export LD_LIBRARY_PATH=${PWD}/internal/core/output/lib/
 make install -e BUILD_TAGS=v%{tag_version} -e GIT_COMMIT=%{git_commit}
