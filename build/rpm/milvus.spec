@@ -29,7 +29,7 @@ Release:          %{release}
 Summary:          V2 RPM
 License:          ASL 2.0
 URL:              https://milvus.io/
-BuildRequires:    epel-release centos-release-scl-rh
+BuildRequires:    epel-release centos-release-scl-rh zlib-devel
 BuildRequires:    wget git python3-devel make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
 ExclusiveArch:    x86_64
 Source0:          https://github.com/milvus-io/milvus/archive/refs/tags/v%{tag_version}.tar.gz#/milvus-%{tag_version}.tar.gz
@@ -115,7 +115,6 @@ done
 # remove set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) for libNGT
 sed -i '/set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)/d' internal/core/src/index/thirdparty/NGT/CMakeLists.txt
 
-sed '1i set(BOOST_ROOT /root/rpmbuild/BUILD/boost_1_65_1)' internal/core/thirdparty/boost_ext/CMakeLists.txt
 
 export LD_LIBRARY_PATH=${PWD}/internal/core/output/lib/
 make install -e BUILD_TAGS=v%{tag_version} -e GIT_COMMIT=%{git_commit}
