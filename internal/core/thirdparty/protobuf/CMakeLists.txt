@@ -14,8 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set( PROTOBUF_SOURCE_URL
-     "https://github.com/protocolbuffers/protobuf/releases/download/v3.9.0/protobuf-cpp-3.9.0.zip" )
+# set( PROTOBUF_SOURCE_URL
+#      "https://github.com/protocolbuffers/protobuf/releases/download/v3.9.0/protobuf-cpp-3.9.0.zip" )
+
+if ( DEFINED ENV{MILVUS_PROTOBUF_URL} )
+    set( PROTOBUF_SOURCE_URL "$ENV{MILVUS_PROTOBUF_URL}" )
+else ()
+    set( PROTOBUF_SOURCE_URL
+         "https://github.com/protocolbuffers/protobuf/releases/download/v3.9.0/protobuf-cpp-3.9.0.zip" )
+endif ()
 
 message( STATUS "Building protobuf-cpp-3.9.0 from source" )
 

@@ -27,8 +27,11 @@ if ( APPLE )
             "https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz")
 else ()
     set( ROCKSDB_VERSION "6.15.2" )
-    set( ROCKSDB_SOURCE_URL
-            "https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz")
+    if ( DEFINED ENV{MILVUS_ROCKSDB_URL} )
+        set( ROCKSDB_SOURCE_URL "$ENV{MILVUS_ROCKSDB_URL}" )
+    else ()
+        set( ROCKSDB_SOURCE_URL "https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz")
+    endif ()
 endif ()
 
 if( CUSTOM_THIRDPARTY_DOWNLOAD_PATH )
