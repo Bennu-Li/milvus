@@ -14,14 +14,6 @@
 %global git_commit 6336e23
 %endif
 
-%global openblas_version 0.3.9
-%global boost_version 1.65.1
-%global boost_version_alias 1_65_1
-%global tbb_commit 9e219e24fe223b299783200f217e9d27790a87b0
-%global go_version 1.15.2
-%global cmake_version 3.18.6
-%global arch linux-amd64
-
 
 Name:             milvus
 Version:          %{version}
@@ -29,15 +21,10 @@ Release:          %{release}
 Summary:          V2 RPM
 License:          ASL 2.0
 URL:              https://milvus.io/
-BuildRequires:    epel-release centos-release-scl-rh zlib-devel
-BuildRequires:    wget git python3-devel make automake devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-gcc-gfortran
+BuildRequires:    zlib-devel git python3-devel make automake gcc gcc-c++ gcc-gfortran
+BuildRequires:    cmake >= 3.18 golang >= 1.15 tbb-devel openblas-devel boost-devel
 ExclusiveArch:    x86_64
 Source0:          https://github.com/milvus-io/milvus/archive/refs/tags/v%{tag_version}.tar.gz#/milvus-%{tag_version}.tar.gz
-Source1:          https://github.com/xianyi/OpenBLAS/archive/v%{openblas_version}.tar.gz#/OpenBLAS-%{openblas_version}.tar.gz
-Source2:          https://boostorg.jfrog.io/artifactory/main/release/%{boost_version}/source/boost_%{boost_version_alias}.tar.gz
-Source3:          https://github.com/wjakob/tbb/archive/%{tbb_commit}.zip#/tbb.zip
-Source4:          https://go.dev/dl/go%{go_version}.%{arch}.tar.gz#/go.tar.gz
-Source5:          https://github.com/Kitware/CMake/releases/download/v%{cmake_version}/cmake-%{cmake_version}-Linux-x86_64.tar.gz#/cmake.tar.gz
 
 %description
 Milvus is an open-source vector database for unstructured data. 
@@ -46,37 +33,8 @@ Milvus is an open-source vector database for unstructured data.
 %prep
 mkdir -p %{_builddir}
 tar -xf %{SOURCE0} -C %{_builddir}/
-tar -xf %{SOURCE1} -C %{_builddir}/
-tar -xf %{SOURCE2} -C %{_builddir}/
-unzip %{SOURCE3} -d %{_builddir}/
-# install go
-rm -rf /usr/local/go && rm -f /usr/bin/go && tar -C /usr/local -xzf %{SOURCE4} && ln -s /usr/local/go/bin/go /usr/bin/go
-
-# install camke
-rm -rf /usr/local/cmake-%{cmake_version}-Linux-x86_64 && \
-    rm -f /usr/local/bin/cmake && rm -f /usr/local/bin/ccmake && rm -f /usr/local/bin/cmake-gui 
-tar -C /usr/local -xzf %{SOURCE5} && \
-    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/cmake /usr/local/bin/cmake && \
-    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/ccmake /usr/local/bin/ccmake && \
-    ln -s /usr/local/cmake-%{cmake_version}-Linux-x86_64/bin/cmake-gui /usr/local/bin/cmake-gui
-
-echo "source scl_source enable devtoolset-7" > /etc/profile.d/devtoolset-7.sh
 
 %build
-# build install lib tbb
-cd %{_builddir}/tbb-%{tbb_commit}/build
-source /etc/profile.d/devtoolset-7.sh && \
-    cmake .. && make -j && make install
-
-# build install lib openblas
-cd %{_builddir}/OpenBLAS-%{openblas_version}
-source /etc/profile.d/devtoolset-7.sh && make TARGET=CORE2 DYNAMIC_ARCH=1 DYNAMIC_OLDER=1 USE_THREAD=0 USE_OPENMP=0 FC=gfortran CC=gcc COMMON_OPT="-O3 -g -fPIC" FCOMMON_OPT="-O3 -g -fPIC -frecursive" NMAX="NUM_THREADS=128" LIBPREFIX="libopenblas" LAPACKE="NO_LAPACKE=1" INTERFACE64=0 NO_STATIC=1 && \
-    make PREFIX=/usr NO_STATIC=1 install
-
-# build install lib boost
-cd %{_builddir}/boost_%{boost_version_alias}
-source /etc/profile.d/devtoolset-7.sh && ./bootstrap.sh --prefix=/usr/local --with-toolset=gcc --without-libraries=python && \
-    ./b2 -j2 --prefix=/usr/local --without-python toolset=gcc install
 
 # build install milvus
 cd %{_builddir}/milvus-%{tag_version}
@@ -115,6 +73,23 @@ done
 # remove set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) for libNGT
 sed -i '/set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)/d' internal/core/src/index/thirdparty/NGT/CMakeLists.txt
 
+# use go mod
+sed -i 's/GO111MODULE=on \$(GO) build/GO111MODULE=on \$(GO) build -mod vendor/g' Makefile
+
+sed -i '$d' scripts/cwrapper_rocksdb_build.sh
+
+export MILVUS_FIU_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/1.00.tar.gz'
+export MILVUS_OPENTRACING_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/v1.5.1.tar.gz'
+export MILVUS_PROTOBUF_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/protobuf-cpp-3.9.0.zip'
+export MILVUS_YAMLCPP_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/yaml-cpp-0.6.3.tar.gz'
+export MILVUS_ROCKSDB_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/v6.15.2.tar.gz'
+export MILVUS_ARROW_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/apache-arrow-6.0.1.tar.gz'
+
+export ARROW_THRIFT_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/apache_arrow_dep/thrift-0.13.0.tar.gz'
+export ARROW_JEMALLOC_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/apache_arrow_dep/jemalloc-5.2.1.tar.bz2'
+export ARROW_XSIMD_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/apache_arrow_dep/aeec9c872c8b475dedd7781336710f2dd2666cb2.tar.gz'
+export ARROW_UTF8PROC_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/apache_arrow_dep/v2.6.1.tar.gz'
+export ARROW_BOOST_URL='%{_builddir}/milvus-%{tag_version}/download_thirdparty/apache_arrow_dep/boost_1_75_0.tar.gz'
 
 export LD_LIBRARY_PATH=${PWD}/internal/core/output/lib/
 make install -e BUILD_TAGS=v%{tag_version} -e GIT_COMMIT=%{git_commit}
@@ -148,15 +123,13 @@ strip lib/libmilvus_indexbuilder.so
 install -m 755 lib/libmilvus_indexbuilder.so %{buildroot}/lib64/milvus/libmilvus_indexbuilder.so
 strip lib/libmilvus_segcore.so
 install -m 755 lib/libmilvus_segcore.so %{buildroot}/lib64/milvus/libmilvus_segcore.so
-strip %{_builddir}/OpenBLAS-%{openblas_version}/libopenblas-r0.3.9.so
-install -m 755 %{_builddir}/OpenBLAS-%{openblas_version}/libopenblas-r0.3.9.so %{buildroot}/lib64/milvus/libopenblas.so.0
-strip %{_builddir}/tbb-%{tbb_commit}/build/libtbb.so
-install -m 755 %{_builddir}/tbb-%{tbb_commit}/build/libtbb.so %{buildroot}/lib64/milvus/libtbb.so
+install -m 755 /usr/lib64/libopenblas.so %{buildroot}/lib64/milvus/libopenblas.so.0
+install -m 755 /usr/lib64/libtbb.so %{buildroot}/lib64/milvus/libtbb.so
 strip lib/libfiu.so.1.00
 install -m 755 lib/libfiu.so.1.00 %{buildroot}/lib64/milvus/libfiu.so.0
 strip lib/libngt.so.1.12.0 
 install -m 755 lib/libngt.so.1.12.0 %{buildroot}/lib64/milvus/libngt.so.1
-install -m 755 /usr/lib64/libgfortran.so.4.0.0 %{buildroot}/lib64/milvus/libgfortran.so.4
+install -m 755 /usr/lib64/libgfortran.so.5.0.0 %{buildroot}/lib64/milvus/libgfortran.so.5
 
 # conf
 install -m 644 configs/milvus.yaml %{buildroot}/etc/milvus/configs/milvus.yaml
@@ -203,7 +176,7 @@ systemctl daemon-reload
 /lib64/milvus/libopenblas.so.0
 /lib64/milvus/libfiu.so.0
 /lib64/milvus/libngt.so.1
-/lib64/milvus/libgfortran.so.4
+/lib64/milvus/libgfortran.so.5
 /lib64/milvus/libtbb.so
 
 %config(noreplace) /etc/milvus/configs/milvus.yaml

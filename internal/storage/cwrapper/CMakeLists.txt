@@ -22,8 +22,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include( ExternalProject )
 set( ARROW_VERSION "6.0.1" )
-set( ARROW_SOURCE_URL
-    "https://github.com/apache/arrow/archive/apache-arrow-${ARROW_VERSION}.tar.gz")
+# set( ARROW_SOURCE_URL
+#     "https://github.com/apache/arrow/archive/apache-arrow-${ARROW_VERSION}.tar.gz")
+
+if ( DEFINED ENV{MILVUS_ARROW_URL} )
+    set( ARROW_SOURCE_URL "$ENV{MILVUS_ARROW_URL}" )
+else ()
+    set( ARROW_SOURCE_URL "https://github.com/apache/arrow/archive/apache-arrow-${ARROW_VERSION}.tar.gz")
+endif ()
 
 if( CUSTOM_THIRDPARTY_DOWNLOAD_PATH )
     set( THIRDPARTY_DOWNLOAD_PATH ${CUSTOM_THIRDPARTY_DOWNLOAD_PATH} )
