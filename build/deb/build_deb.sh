@@ -25,7 +25,7 @@ cp /usr/lib/x86_64-linux-gnu/libquadmath.so.0.0.0 milvus-deb/milvus/milvus-lib/l
 cp /usr/lib/x86_64-linux-gnu/libtbb.so.2 milvus-deb/milvus/milvus-lib/libtbb.so.2
 cp /usr/lib/libopenblas-r0.3.9.so milvus-deb/milvus/milvus-lib/libopenblas.so.0
 ## script
-cp -r scripts milvus-deb/milvus/
+cp -r milvus/build/deb/scripts milvus-deb/milvus/
 ## config
 cp -r milvus/configs milvus-deb/milvus/
 

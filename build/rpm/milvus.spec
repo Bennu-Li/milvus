@@ -1,5 +1,5 @@
 %if 0%{!?version:1}
-%global version 2.0.2
+%global version 2.2.0
 %endif
 
 %if 0%{!?release:1}
@@ -25,6 +25,7 @@ Milvus makes unstructured data search more accessible, and provides a consistent
 mkdir -p %{buildroot}/usr/bin/
 mkdir -p %{buildroot}/lib64/milvus
 mkdir -p %{buildroot}/etc/milvus/configs/advanced
+mkdir -p %{buildroot}/etc/milvus/configs/cert
 mkdir -p %{buildroot}/etc/systemd/system/
 mkdir -p %{buildroot}/etc/ld.so.conf.d/
 
@@ -37,17 +38,35 @@ install -m 755 bin/etcd %{buildroot}/usr/bin/milvus-etcd
 install -m 755 bin/minio %{buildroot}/usr/bin/milvus-minio
 
 # lib
+install -m 755 lib/libmarisa.so.0.0.0 %{buildroot}/lib64/milvus/libmarisa.so
+install -m 755 lib/libmarisa.so.0.0.0 %{buildroot}/lib64/milvus/libmarisa.so.0
+install -m 755 lib/libjemalloc.so.2 %{buildroot}/lib64/milvus/libjemalloc.so
+
 install -m 755 lib/libknowhere.so %{buildroot}/lib64/milvus/libknowhere.so
+install -m 755 lib/libmilvus_storage.so %{buildroot}/lib64/milvus/libmilvus_storage.so
 install -m 755 lib/libmilvus_common.so %{buildroot}/lib64/milvus/libmilvus_common.so
 install -m 755 lib/libmilvus_indexbuilder.so %{buildroot}/lib64/milvus/libmilvus_indexbuilder.so
+install -m 755 lib/libmilvus_index.so %{buildroot}/lib64/milvus/libmilvus_index.so
 install -m 755 lib/libmilvus_segcore.so %{buildroot}/lib64/milvus/libmilvus_segcore.so
+
+install -m 755 /usr/local/lib/libboost_system.so.1.65.1 %{buildroot}/lib64/milvus/libboost_system.so.1.65.1
+install -m 755 /usr/local/lib/libboost_filesystem.so.1.65.1 %{buildroot}/lib64/milvus/libboost_filesystem.so.1.65.1
 install -m 755 /usr/lib/libopenblas-r0.3.9.so %{buildroot}/lib64/milvus/libopenblas.so.0
-install -m 755 lib/libngt.so.1.12.0 %{buildroot}/lib64/milvus/libngt.so.1
 install -m 755 /usr/lib64/libgfortran.so.4.0.0 %{buildroot}/lib64/milvus/libgfortran.so.4
 
 # conf
 install -m 755 configs/milvus.yaml %{buildroot}/etc/milvus/configs/milvus.yaml
 install -m 755 configs/advanced/etcd.yaml %{buildroot}/etc/milvus/configs/advanced/etcd.yaml
+
+install -m 755 configs/cert/ca.key %{buildroot}/etc/milvus/configs/cert/ca.key
+install -m 755 configs/cert/ca.pem %{buildroot}/etc/milvus/configs/cert/ca.pem
+install -m 755 configs/cert/ca.srl %{buildroot}/etc/milvus/configs/cert/ca.srl
+install -m 755 configs/cert/client.csr %{buildroot}/etc/milvus/configs/cert/client.csr
+install -m 755 configs/cert/client.key %{buildroot}/etc/milvus/configs/cert/client.key
+install -m 755 configs/cert/client.pem %{buildroot}/etc/milvus/configs/cert/client.pem
+install -m 755 configs/cert/server.csr %{buildroot}/etc/milvus/configs/cert/server.csr
+install -m 755 configs/cert/server.key %{buildroot}/etc/milvus/configs/cert/server.key
+install -m 755 configs/cert/server.pem %{buildroot}/etc/milvus/configs/cert/server.pem
 
 # service
 install -m 644 services/milvus.service %{buildroot}/etc/systemd/system/milvus.service
@@ -75,22 +94,38 @@ rm -rf /etc/milvus
 ldconfig
 systemctl daemon-reload
 
-%files
-/usr/bin/milvus
+%files/usr/bin/milvus
 /usr/bin/milvus-server
 /usr/bin/milvus-etcd
 /usr/bin/milvus-minio
 
+/lib64/milvus/libmarisa.so
+/lib64/milvus/libmarisa.so.0
+/lib64/milvus/libjemalloc.so
+
 /lib64/milvus/libknowhere.so
+/lib64/milvus/libmilvus_index.so
 /lib64/milvus/libmilvus_common.so
 /lib64/milvus/libmilvus_indexbuilder.so
 /lib64/milvus/libmilvus_segcore.so
+/lib64/milvus/libmilvus_storage.so
+
+/lib64/milvus/libboost_system.so.1.65.1
+/lib64/milvus/libboost_filesystem.so.1.65.1
 /lib64/milvus/libopenblas.so.0
-/lib64/milvus/libngt.so.1
 /lib64/milvus/libgfortran.so.4
 
 /etc/milvus/configs/milvus.yaml
 /etc/milvus/configs/advanced/etcd.yaml
+/etc/milvus/configs/cert/ca.key
+/etc/milvus/configs/cert/ca.pem
+/etc/milvus/configs/cert/ca.srl
+/etc/milvus/configs/cert/client.csr
+/etc/milvus/configs/cert/client.key
+/etc/milvus/configs/cert/client.pem
+/etc/milvus/configs/cert/server.csr
+/etc/milvus/configs/cert/server.key
+/etc/milvus/configs/cert/server.pem
 
 /etc/systemd/system/milvus.service
 /etc/systemd/system/milvus-etcd.service

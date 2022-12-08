@@ -284,6 +284,8 @@ rpm: install
 	@wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio.RELEASE.2021-02-14T04-01-33Z -O bin/minio
 	@cp -r bin ~/rpmbuild/BUILD/
 	@cp -r lib ~/rpmbuild/BUILD/
+	@cp -r internal/core/output/lib ~/rpmbuild/BUILD/
+	@cp internal/core/output/lib64/lib*.so ~/rpmbuild/BUILD/lib/
 	@cp -r configs ~/rpmbuild/BUILD/
 	@cp -r build/rpm/services ~/rpmbuild/BUILD/
 	@QA_RPATHS="$$[ 0x001|0x0002|0x0020 ]" rpmbuild -ba ./build/rpm/milvus.spec
