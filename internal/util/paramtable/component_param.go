@@ -1291,6 +1291,7 @@ type queryNodeConfig struct {
 
 	// segcore
 	ChunkRows        ParamItem `refreshable:"false"`
+	GpuResNum        ParamItem `refreshable:"false"`
 	SmallIndexNlist  ParamItem `refreshable:"false"`
 	SmallIndexNProbe ParamItem `refreshable:"false"`
 
@@ -1365,6 +1366,22 @@ func (p *queryNodeConfig) init(base *BaseTable) {
 		Export: true,
 	}
 	p.ChunkRows.Init(base.mgr)
+
+	p.GpuResNum = ParamItem{
+		Key:          "queryNode.segcore.gpuResNum",
+		Version:      "2.0.0",
+		DefaultValue: "2",
+		Formatter: func(v string) string {
+			num := getAsInt(v)
+			if num <= 0 || num > 8 {
+				return "2"
+			}
+			return v
+		},
+		Doc:    "The number of resources available in one GPU",
+		Export: true,
+	}
+	p.GpuResNum.Init(base.mgr)
 
 	p.SmallIndexNlist = ParamItem{
 		Key:     "queryNode.segcore.smallIndex.nlist",

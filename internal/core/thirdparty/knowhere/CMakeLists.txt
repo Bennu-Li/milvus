@@ -22,11 +22,15 @@ else ()
     set(WITH_DISKANN OFF CACHE BOOL "" FORCE )
 endif ()
 
+if ( MILVUS_GPU_VERSION STREQUAL "ON" )
+    set(USE_CUDA ON CACHE BOOL "" FORCE )
+endif ()
+
 set( CMAKE_PREFIX_PATH ${CONAN_BOOST_ROOT} )
 FetchContent_Declare(
         knowhere
         GIT_REPOSITORY  "https://github.com/milvus-io/knowhere.git"
-        GIT_TAG         ${KNOWHERE_VERSION}
+        GIT_TAG         main
         SOURCE_DIR      ${CMAKE_CURRENT_BINARY_DIR}/knowhere-src
         BINARY_DIR      ${CMAKE_CURRENT_BINARY_DIR}/knowhere-build
         DOWNLOAD_DIR    ${THIRDPARTY_DOWNLOAD_PATH} )

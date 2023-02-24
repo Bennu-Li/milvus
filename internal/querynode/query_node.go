@@ -232,6 +232,11 @@ func (node *QueryNode) InitSegcore() {
 	cCPUNum := C.int(hardware.GetCPUNum())
 	C.InitCpuNum(cCPUNum)
 
+	// init GPU resource
+	cGpuId := C.int32_t(0)
+	cResNum := C.int32_t(Params.QueryNodeCfg.GpuResNum.GetAsInt())
+	C.SegcoreInitGPU(cGpuId, cResNum)
+
 	initcore.InitLocalStorageConfig(Params)
 }
 
