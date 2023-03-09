@@ -174,6 +174,10 @@ build-cpp-with-unittest: download-milvus-proto
 	@echo "Building Milvus cpp library with unittest ..."
 	@(env bash $(PWD)/scripts/core_build.sh -t ${mode} -u -f "$(CUSTOM_THIRDPARTY_PATH)" -n ${disk_index})
 
+build-cpp-gpu-with-coverage: download-milvus-proto
+	@echo "Building Milvus cpp library with coverage and unittest ..."
+	@(env bash $(PWD)/scripts/core_build.sh -t ${mode} -g -u -a ${useasan} -c -f "$(CUSTOM_THIRDPARTY_PATH)" -n ${disk_index})
+
 build-cpp-with-coverage: download-milvus-proto
 	@echo "Building Milvus cpp library with coverage and unittest ..."
 	@(env bash $(PWD)/scripts/core_build.sh -t ${mode} -u -a ${useasan} -c -f "$(CUSTOM_THIRDPARTY_PATH)" -n ${disk_index})
@@ -347,3 +351,4 @@ generate-mockery: getdeps
 	#internal/types
 	$(PWD)/bin/mockery --name=QueryCoordComponent --dir=$(PWD)/internal/types --output=$(PWD)/internal/types --filename=mock_querycoord.go --with-expecter --structname=MockQueryCoord --outpkg=types --inpackage
 ci-ut: build-cpp-with-coverage generated-proto-go-without-cpp codecov-cpp codecov-go
+gpu-ci-ut: build-cpp-gpu-with-coverage generated-proto-go-without-cpp codecov-cpp codecov-go
