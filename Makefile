@@ -179,7 +179,7 @@ build-cpp-gpu-with-coverage: download-milvus-proto
 	@(env bash $(PWD)/scripts/core_build.sh -t ${mode} -g -u -a ${useasan} -c -f "$(CUSTOM_THIRDPARTY_PATH)" -n ${disk_index})
 
 build-cpp-with-coverage: download-milvus-proto
-	@echo "Building Milvus cpp library with coverage and unittest ..."
+	@echo "Building Milvus cpp gpu library with coverage and unittest ..."
 	@(env bash $(PWD)/scripts/core_build.sh -t ${mode} -u -a ${useasan} -c -f "$(CUSTOM_THIRDPARTY_PATH)" -n ${disk_index})
 
 
@@ -266,8 +266,16 @@ codecov-go: build-cpp-with-coverage
 	@echo "Running go coverage..."
 	@(env bash $(PWD)/scripts/run_go_codecov.sh)
 
+codecov-go-gpu: build-cpp-gpu-with-coverage
+	@echo "Running go coverage..."
+	@(env bash $(PWD)/scripts/run_go_codecov.sh)
+
 # Run codecov-cpp
 codecov-cpp: build-cpp-with-coverage
+	@echo "Running cpp coverage..."
+	@(env bash $(PWD)/scripts/run_cpp_codecov.sh)
+
+codecov-cpp-gpu: build-cpp-gpu-with-coverage
 	@echo "Running cpp coverage..."
 	@(env bash $(PWD)/scripts/run_cpp_codecov.sh)
 
@@ -350,5 +358,7 @@ generate-mockery: getdeps
 	$(PWD)/bin/mockery --name=GarbageCollector --dir=$(PWD)/internal/rootcoord --output=$(PWD)/internal/rootcoord/mocks --filename=garbage_collector.go --with-expecter --outpkg=mockrootcoord
 	#internal/types
 	$(PWD)/bin/mockery --name=QueryCoordComponent --dir=$(PWD)/internal/types --output=$(PWD)/internal/types --filename=mock_querycoord.go --with-expecter --structname=MockQueryCoord --outpkg=types --inpackage
+
 ci-ut: build-cpp-with-coverage generated-proto-go-without-cpp codecov-cpp codecov-go
-gpu-ci-ut: build-cpp-gpu-with-coverage generated-proto-go-without-cpp codecov-cpp codecov-go
+
+gpu-ci-ut: build-cpp-gpu-with-coverage generated-proto-go-without-cpp codecov-cpp-gpu codecov-go-gpu

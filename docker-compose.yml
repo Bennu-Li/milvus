@@ -45,8 +45,8 @@ services:
         make check-proto-product && make verifiers && make unittest"
 
   gpubuilder:
-    image: harbor.milvus.io/milvus/milvus-gpu-env:amd64-ubuntu20.04-20230313-8b21846
-    # image: ${IMAGE_REPO}/milvus-gpu-env:${IMAGE_ARCH}-${OS_NAME}-${GPU_DATE_VERSION}
+    # image: harbor.milvus.io/milvus/milvus-gpu-env:amd64-ubuntu20.04-20230314-0e01d79
+    image: ${IMAGE_REPO}/milvus-gpu-env:${IMAGE_ARCH}-${OS_NAME}-${GPU_DATE_VERSION}
     # Build devcontainer
     build:
       context: .
