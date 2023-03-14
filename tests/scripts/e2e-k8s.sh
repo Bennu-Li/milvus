@@ -114,6 +114,11 @@ while (( "$#" )); do
       MANUAL=true
       shift
     ;;
+    --gpu)
+      GPU_BUILD=true
+      shift
+    ;;
+
     --topology)
       case $2 in
         SINGLE_CLUSTER | MULTICLUSTER_SINGLE_NETWORK | MULTICLUSTER )
@@ -197,7 +202,15 @@ Use \"$0  --help\" for more information about a given command.
   esac
 done
 
-export BUILD_COMMAND="${BUILD_COMMAND:-make install}"
+if [[ -n "${GPU_BUILD:-}" ]]; then
+  export BUILD_COMMAND="${BUILD_COMMAND:-make gpu-install}"
+  export BUILD_SCRIPT="builder_gpu.sh"
+  export BUILD_IMAGE_SCRIPT="build_image_gpu.sh"
+else
+  export BUILD_COMMAND="${BUILD_COMMAND:-make install}"
+  export BUILD_SCRIPT="builder.sh"
+  export BUILD_IMAGE_SCRIPT="build_image.sh"
+fi
 
 export MANUAL="${MANUAL:-}"
 
@@ -296,7 +309,7 @@ if [[ -z "${SKIP_BUILD:-}" ]]; then
     trace "setup kind registry" setup_kind_registry
   fi 
   pushd "${ROOT}"
-    trace "build milvus" "${ROOT}/build/builder.sh" /bin/bash -c "${BUILD_COMMAND}"
+    trace "build milvus" "${ROOT}/build/${BUILD_SCRIPT}" /bin/bash -c "${BUILD_COMMAND}"
   popd
 fi
 
@@ -324,7 +337,7 @@ if [[ -z "${SKIP_BUILD_IMAGE:-}" ]]; then
 
   pushd "${ROOT}"
     # Build Milvus Docker Image
-    trace "build milvus image" "${ROOT}/build/build_image.sh"
+    trace "build milvus image" "${ROOT}/build/${BUILD_IMAGE_SCRIPT}"
     trace "push milvus image" docker push "${MILVUS_IMAGE_REPO}:${MILVUS_IMAGE_TAG}"
   popd
 fi
