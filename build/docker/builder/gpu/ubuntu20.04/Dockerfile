@@ -16,21 +16,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-ce
     apt-get update && apt-get install -y --no-install-recommends \
     g++ gcc gfortran git make ccache libssl-dev zlib1g-dev unzip \
     clang-format-10 clang-tidy-10 lcov libtool m4 autoconf automake python3 python3-pip \
-    pkg-config uuid-dev libaio-dev libgoogle-perftools-dev && \
+    pkg-config uuid-dev libaio-dev libgoogle-perftools-dev libopenblas-dev && \
     apt-get remove --purge -y && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install conan==1.58.0
 
 # Instal openblas
-RUN wget https://github.com/xianyi/OpenBLAS/archive/v0.3.21.tar.gz && \
-    tar zxvf v0.3.21.tar.gz && cd OpenBLAS-0.3.21 && \
-    make NO_STATIC=1 NO_LAPACK=1 NO_LAPACKE=1 NO_CBLAS=1 NO_AFFINITY=1 USE_OPENMP=1 \
-       TARGET=HASWELL DYNAMIC_ARCH=1 \
-       NUM_THREADS=64 MAJOR_VERSION=3 libs shared && \
-    make PREFIX=/usr/local NUM_THREADS=64 MAJOR_VERSION=3 install && \
-    rm -f /usr/local/include/cblas.h /usr/local/include/lapack* && \
-    cd .. && rm -rf OpenBLAS-0.3.21 && rm v0.3.21.tar.gz
+# RUN wget https://github.com/xianyi/OpenBLAS/archive/v0.3.21.tar.gz && \
+#    tar zxvf v0.3.21.tar.gz && cd OpenBLAS-0.3.21 && \
+#    make NO_STATIC=1 NO_LAPACK=1 NO_LAPACKE=1 NO_CBLAS=1 NO_AFFINITY=1 USE_OPENMP=1 \
+#       TARGET=HASWELL DYNAMIC_ARCH=1 \
+#       NUM_THREADS=64 MAJOR_VERSION=3 libs shared && \
+#    make PREFIX=/usr/local NUM_THREADS=64 MAJOR_VERSION=3 install && \
+#    rm -f /usr/local/include/cblas.h /usr/local/include/lapack* && \
+#    cd .. && rm -rf OpenBLAS-0.3.21 && rm v0.3.21.tar.gz
 
 ENV LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/lib"
 
