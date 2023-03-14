@@ -47,7 +47,6 @@ services:
   gpubuilder:
     image: harbor.milvus.io/milvus/milvus-gpu-env:amd64-ubuntu20.04-20230313-8b21846
     # image: ${IMAGE_REPO}/milvus-gpu-env:${IMAGE_ARCH}-${OS_NAME}-${GPU_DATE_VERSION}
-    # image: ${IMAGE_REPO}/milvus-env:${IMAGE_ARCH}-${OS_NAME}-${DATE_VERSION}
     # Build devcontainer
     build:
       context: .
@@ -67,7 +66,7 @@ services:
       ETCD_ENDPOINTS: ${ETCD_ENDPOINTS}
       MINIO_ADDRESS: ${MINIO_ADDRESS}
       CONAN_USER_HOME: /home/milvus
-    volumes: &builder-volumes
+    volumes: &builder-volumes-gpu
       - .:/go/src/github.com/milvus-io/milvus:delegated
       - ${DOCKER_VOLUME_DIRECTORY:-.docker}/${IMAGE_ARCH}-${OS_NAME}-ccache:/ccache:delegated
       - ${DOCKER_VOLUME_DIRECTORY:-.docker}/${IMAGE_ARCH}-${OS_NAME}-go-mod:/go/pkg/mod:delegated
@@ -79,7 +78,7 @@ services:
       - minio
       - pulsar
     # Command
-    command: &builder-command >
+    command: &builder-command-gpu >
       /bin/bash -c "
         make check-proto-product && make verifiers && make unittest"
 
