@@ -10,7 +10,7 @@ export OS_NAME="${OS_NAME:-ubuntu20.04}"
 pushd "${toplevel}"
 
 if [[ "${1-}" == "pull" ]]; then
-    docker-compose pull -f docker-compose-gpu.yml --ignore-pull-failures builder
+    docker-compose pull --ignore-pull-failures gpubuilder
     exit 0
 fi
 
@@ -38,15 +38,15 @@ mkdir -p "${DOCKER_VOLUME_DIRECTORY:-.docker}/amd64-${OS_NAME}-vscode-extensions
 mkdir -p "${DOCKER_VOLUME_DIRECTORY:-.docker}/amd64-${OS_NAME}-conan"
 chmod -R 777 "${DOCKER_VOLUME_DIRECTORY:-.docker}"
 
-docker-compose pull -f docker-compose-gpu.yml --ignore-pull-failures builder
+docker-compose pull --ignore-pull-failures gpubuilder
 if [[ "${CHECK_BUILDER:-}" == "1" ]]; then
-    docker-compose build -f docker-compose-gpu.yml builder 
+    docker-compose build gpubuilder 
 fi
 
 if [[ "$(id -u)" != "0" ]]; then
-    docker-compose run --no-deps --rm -u "$uid:$gid" builder "$@"
+    docker-compose run --no-deps --rm -u "$uid:$gid" gpubuilder "$@"
 else
-    docker-compose run --no-deps --rm --entrypoint "/tini -- /entrypoint.sh" builder "$@"
+    docker-compose run --no-deps --rm --entrypoint "/tini -- /entrypoint.sh" gpubuilder "$@"
 fi
 
 popd
