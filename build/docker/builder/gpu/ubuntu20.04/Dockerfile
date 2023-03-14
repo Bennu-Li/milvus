@@ -9,10 +9,6 @@
 # is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 # or implied. See the License for the specific language governing permissions and limitations under the License.
 
-# FROM milvusdb/openblas:ubuntu20.04-20220914-179ea77
-
-# FROM nvidia/cuda:11.8.0-runtime-ubuntu20.04
-
 FROM nvidia/cuda:11.8.0-devel-ubuntu20.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-certificates gnupg2 && \
