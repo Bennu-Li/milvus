@@ -42,7 +42,7 @@ pipeline {
             steps {
                 container('main') {
                     sh '''
-                    ./build/builder.sh /bin/bash -c "make milvus-gpu"
+                    ./build/builder_gpu.sh /bin/bash -c "make milvus-gpu"
                     '''
                     // dir ('build'){
                     //         sh './set_docker_mirror.sh'
