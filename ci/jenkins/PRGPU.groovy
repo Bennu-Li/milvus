@@ -41,9 +41,6 @@ pipeline {
         stage ('Build'){
             steps {
                 container('main') {
-                    // sh '''
-                    // ./build/builder_gpu.sh /bin/bash -c "make milvus-gpu"
-                    // '''
                     dir ('build'){
                             sh './set_docker_mirror.sh'
                     }
@@ -52,9 +49,8 @@ pipeline {
                             sh 'printenv'
                             def date = sh(returnStdout: true, script: 'date +%Y%m%d').trim()
                             sh 'git config --global --add safe.directory /home/jenkins/agent/workspace'
-                            def gitShortCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()    
+                            def gitShortCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
                             imageTag="gpu-${env.BRANCH_NAME}-${date}-${gitShortCommit}"
-                            sh 
                             withCredentials([usernamePassword(credentialsId: "${env.CI_DOCKER_CREDENTIAL_ID}", usernameVariable: 'CI_REGISTRY_USERNAME', passwordVariable: 'CI_REGISTRY_PASSWORD')]){
                                 sh """
                                 TAG="${imageTag}" \
