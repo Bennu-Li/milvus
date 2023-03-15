@@ -183,5 +183,8 @@ standalone:
     nvidia.com/gpu.present: 'true'
   resources:
     requests:
+      nvidia.com/gpu: 1
       cpu: "0.5"
       memory: "3.5Gi"
+    limits:
+      nvidia.com/gpu: 1
