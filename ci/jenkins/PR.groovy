@@ -35,6 +35,7 @@ pipeline {
         JENKINS_BUILD_ID = "${env.BUILD_ID}"
         CI_MODE="pr"
         SHOW_MILVUS_CONFIGMAP= true
+        FEISHU_WEBHOOK_ID="feishu-webhook-e2e-notify"
     }
 
     stages {
@@ -51,24 +52,36 @@ pipeline {
                             sh 'git config --global --add safe.directory /home/jenkins/agent/workspace'
                             def gitShortCommit = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()    
                             imageTag="${env.BRANCH_NAME}-${date}-${gitShortCommit}"
-                            withCredentials([usernamePassword(credentialsId: "${env.CI_DOCKER_CREDENTIAL_ID}", usernameVariable: 'CI_REGISTRY_USERNAME', passwordVariable: 'CI_REGISTRY_PASSWORD')]){
-                                sh """
-                                TAG="${imageTag}" \
-                                ./e2e-k8s.sh \
-                                --skip-export-logs \
-                                --skip-install \
-                                --skip-cleanup \
-                                --skip-setup \
-                                --skip-test
-                                """
+                            // withCredentials([usernamePassword(credentialsId: "${env.CI_DOCKER_CREDENTIAL_ID}", usernameVariable: 'CI_REGISTRY_USERNAME', passwordVariable: 'CI_REGISTRY_PASSWORD')]){
+                            //     sh """
+                            //     TAG="${imageTag}" \
+                            //     ./e2e-k8s.sh \
+                            //     --skip-export-logs \
+                            //     --skip-install \
+                            //     --skip-cleanup \
+                            //     --skip-setup \
+                            //     --skip-test
+                            //     """
 
-                                // stash imageTag info for rebuild install & E2E Test only
-                                sh "echo ${imageTag} > imageTag.txt"
-                                stash includes: 'imageTag.txt', name: 'imageTag'
+                            //     // stash imageTag info for rebuild install & E2E Test only
+                            //     sh "echo ${imageTag} > imageTag.txt"
+                            //     stash includes: 'imageTag.txt', name: 'imageTag'
 
-                            }
+                            // }
                         }
                     }
+                }
+            }
+        }
+        post {
+            failure {
+                // echo "build stage failed"
+                withCredentials([string(credentialsId: 'feishu-webhook-e2e-notify', variable: 'FEISHU_URL')]) {
+                    sh """
+                    echo "status: currentBuild.currentResult"
+                    echo ${currentBuild.currentResult}
+                    curl -X POST -H "Content-Type: application/json" -d "{\"msg_type\":\"text\",\"content\":{\"text\":\"[build] statue: currentBuild.currentResult. please check ${RUN_DISPLAY_URL}\"}}" ${FEISHU_URL}
+                    """
                 }
             }
         }
