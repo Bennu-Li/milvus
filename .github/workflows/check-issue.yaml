@@ -1,0 +1,30 @@
+name: Add Comment for issue with Chinese title
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [deleted]
+
+jobs:
+  check_issue_title:
+    name: Check issue title
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get Issue Content
+        shell: bash
+        run: |
+          echo context.issue.number
+          echo "----------------------------"
+          echo context.issue
+      - name: Add comment
+        uses: peter-evans/create-or-update-comment@5f728c3dae25f329afbe34ee4d08eef25569d79f
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            This issue is available  contribution! :sparkles:
