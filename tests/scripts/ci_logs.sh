@@ -86,9 +86,16 @@ if [[ ! -d ${RELEASE_LOG_DIR} ]] ;then
   mkdir -p ${RELEASE_LOG_DIR}
 fi 
 # Try to found logs file from mount disk /volume1/ci-logs
+<<<<<<< HEAD
 log_files=$(find ${LOG_DIR} -type f  -name "*${RELEASE_NAME}*" )
 
 if [ -z "${log_files:-}" ]; then
+=======
+# log_files=$(find ${LOG_DIR} -type f  -name "*${RELEASE_NAME}*" )
+log_files=$(ls ${LOG_DIR} | grep ${RELEASE_NAME} || echo nonexistment)
+
+if [ "${log_files}" == "nonexistment" ]; then
+>>>>>>> a31b33ee2 (Update e2e log archive)
   echo "No log files find"
 else
 for log_file in ${log_files}
@@ -100,9 +107,19 @@ for log_file in ${log_files}
   rm -rf ${RELEASE_LOG_DIR}
 fi
 
+<<<<<<< HEAD
 remain_log_files=$(find ${LOG_DIR} -type f  -name "*${RELEASE_NAME}*")
 
 if [ -z "${remain_log_files:-}" ]; then
+=======
+# remain_log_files=$(find ${LOG_DIR} -type f  -name "*${RELEASE_NAME}*")
+
+# ls ${LOG_DIR} | grep ${RELEASE_NAME}
+
+remain_log_files=$(ls ${LOG_DIR} | grep ${RELEASE_NAME} || echo nonexistment)
+
+if [ "${remain_log_files}" == "nonexistment" ]; then
+>>>>>>> a31b33ee2 (Update e2e log archive)
   echo "No remain log files"
 else
   echo "Still have log files & Remove again"
